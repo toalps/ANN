@@ -1,0 +1,112 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+#define NUMBER 10
+
+//神经网络算法，一个神经元，完成的功能是
+//任意输入0-9的数，判断其是奇偶性。
+
+int weight[NUMBER];
+int inputX[NUMBER]={1,2,3,4,5,6,7,8,9,10};
+int outputY[NUMBER]={1,0,1,0,1,0,1,0,1,0};
+int out[NUMBER];
+int threshold=46;
+
+//初始化权值
+void InitWeight(void)
+{
+    int i=0;
+    srand((unsigned int)time(0));
+    for(i=0;i<NUMBER;i++)
+        weight[i]=rand()%100;
+}
+
+//激活函数：阶跃函数
+int ActiveFunction(int weight,int input)
+{
+    int output= weight*input;
+    if(output>threshold)
+        return 1;
+    else
+        return 0;
+}
+
+//计算输出向量
+void CalculationOutput(void)
+{
+    int i=0;
+    for(i=0;i<NUMBER;i++)
+        out[i]=ActiveFunction(weight[i],inputX[i]);
+}
+
+//调整输出向量，并返回不匹配值
+int AdjustWeight()
+{
+    int err=0,i=0;
+    for(i=0;i<NUMBER;i++)
+    {
+        if(out[i]!=outputY[i])
+        {
+            err++;
+            if(0==out[i])
+                weight[i]+=inputX[i];
+            else
+                weight[i]-=inputX[i];
+        }
+    }
+    return err;
+}
+
+//打印权值
+void  PrintWeight(void)
+{
+    int i=0;
+    for(i=0;i<NUMBER;i++)
+        printf("weight[%i]=%i\n",i,weight[i]);
+}
+
+//权值训练
+void WeightTrain(void)
+{
+    int n=0,err=0;
+    while(1)
+    {
+        n++;
+        CalculationOutput();
+        err=AdjustWeight();
+        if(0>=err)
+            break;
+    }
+    PrintWeight();
+    printf("阈值为%d训练次数%d\n",threshold,n);
+}
+
+//数值训练函数
+void Train(int i)
+{
+    printf("[%i][%i]:",weight[i],inputX[i]);
+    if(ActiveFunction(weight[i],inputX[i]))
+    {
+        printf("%d是偶数\n",i);
+    }
+    else
+    {
+        printf("%d是奇数\n",i);
+    }
+}
+
+int main(void)
+{
+    int input=0;
+    InitWeight();
+    WeightTrain();
+    while(1)
+    {
+        scanf("%i",&input);
+        if(0>input||9<input)
+            break;
+        Train(input);
+    }
+    return 0;
+}
